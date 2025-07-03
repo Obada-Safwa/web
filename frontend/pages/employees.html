@@ -10,7 +10,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
+        <!-- <tr>
           <td class="text-center">
             <div class="btn-group" role="group">
               <button
@@ -78,7 +78,7 @@
           <td>Amela Vatres</td>
           <td>amela.vatres@ibu.edu.ba</td>
           <td>150.000</td>
-        </tr>
+        </tr> -->
       </tbody>
     </table>
   </div>
@@ -163,20 +163,20 @@
          for that employee in the database (6 points)
    */
 
-  function populateEmployeePerformance() {
-  RestClient.get("../backend/rest/employees/performance", function (response) {
-    const tbody = $("#employee-performance tbody");
-    tbody.empty();
-
+  RestClient.get(`employees/performance`, (response) => {
+    const tableBody = document.querySelector("#employee-performance tbody");
+    tableBody.innerHTML = ""; // Clear previous rows
     response.forEach((employee) => {
-      const row = `
-        <tr>
+      const row = document.createElement("tr");
+      row.innerHTML = `
           <td class="text-center">
             <div class="btn-group" role="group">
               <button
+                id = "MyBtn"
                 type="button"
                 class="btn btn-warning"
                 onclick="EmployeesService.edit_employee(${employee.id})"
+                data-toggle="modal" data-target="#edit-employee-modal"
               >
                 Edit
               </button>
@@ -192,38 +192,8 @@
           <td>${employee.full_name}</td>
           <td>${employee.email}</td>
           <td>${employee.total}</td>
-        </tr>
-      `;
-      tbody.append(row);
+        `;
+      tableBody.appendChild(row);
     });
-  }, function (error) {
-    console.error("Failed to load employee performance data:", error);
   });
-}
-
-document.getElementById('edit-employee-form').addEventListener('submit', async function(event) {
-  event.preventDefault();
-  
-  const employee_id = document.getElementById('customer_id').value;
-  const firstName = document.getElementById('first_name').value;
-  const lastName = document.getElementById('last_name').value;
-  const email = document.getElementById('email').value;
-
-  const response = await fetch(`../backend/rest/employee/edit/${employee_id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ lastName, firstName, email })
-  });
-  const employee = await response.json();
-  
-  if (employee) {
-    alert('Employee updated successfully');
-    populateEmployeePerformance();
-  }
-});
-
-populateEmployeePerformance();
-
 </script>

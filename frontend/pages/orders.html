@@ -81,7 +81,7 @@
         ></button>
       </div>
       <div class="modal-body">
-        <table class="table">
+        <table class="table" id="order-label">
           <thead>
             <tr>
               <th scope="col">#</th>
@@ -133,4 +133,52 @@
       a. fetch the order details with clicked id from database (backend) (6 points)
       b. populate the modal (id `order-details-modal`) form with data returned from the backend (6 points)
    */
+  $order_id = 0;
+  RestClient.get("orders/report", (response) => {
+    const tableBody = document.querySelector("#order-details tbody");
+    tableBody.innerHTML = ""; // Clear previous rows
+    response.forEach((order) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+          <td class="text-center">
+            <button
+              id="MyBtn"
+              type="button"
+              class="btn btn-success"
+              data-bs-toggle="modal"
+              data-bs-target="#order-details-modal"
+              data-bs-id="${order.order_number}
+              onclick = detailModal(${order.order_number})"
+            >
+              Details
+            </button>
+          </td>
+          <td>${order.order_number}</td>
+          <td>${order.total_amount}</td>
+        `;
+      tableBody.appendChild(row);
+    });
+  });
+
+  // document.getElementById("#MyBtn").onclick({
+  //   $order_id: document.getElementById("#MyBtn").style.data - bs - id,
+  // });
+  function detailModal(order_id) {
+    RestClient.get("order/details/${order_id}", (response) => {
+      const tableBody = document.querySelector("#order-label tbody");
+      tableBody.innerHTML = ""; // Clear previous rows
+      response.forEach((order) => {
+        const row = document.createElement("tr");
+        console.log(order.details.product_name);
+        row.innerHTML = `
+          <td class="text-center">
+          ${order.details.product_name}
+          </td>
+          <td>${order.details.quantity_ordered}</td>
+          <td>${order.details.price_each}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    });
+  }
 </script>
